@@ -38,8 +38,8 @@ install_cloudera_manager() {
 
     # 6. Set PostgreSQL to listen on all interfaces
     echo "Configuring PostgreSQL to listen on all interfaces..."
-    sudo cp pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
-    sudo cp postgresql.conf /var/lib/pgsql/data/postgresql.conf
+    sudo cp /tmp/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
+    sudo cp /tmp/postgresql.conf /var/lib/pgsql/data/postgresql.conf
 
     # 7. Restart PostgreSQL to apply changes
     sudo systemctl restart postgresql
