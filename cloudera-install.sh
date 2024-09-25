@@ -3,6 +3,8 @@
 # Cloudera Manager Version (choose appropriate version, this is an example for 7.6.1)
 CM_VERSION="7.11.3.11"
 
+CLUSTER_IP=$CLOUDERA_MANAGER_IP
+
 # CM Repository for Cloudera Manager packages (use provided URL)
 CM_REPO_URL="https://a4bb8d9a-4f9b-457b-afc1-e9518d1713bc:c6c0b4c7799f@archive.cloudera.com/p/cm7/${CM_VERSION}/redhat8/yum/cloudera-manager.repo"
 
