@@ -13,34 +13,34 @@ PG_VERSION="16"
 install_cloudera_manager() {
     # 1. Install Java (OpenJDK 1.8.0)
     echo "Installing Java..."
-    yum update -y
-    yum install -y java-1.8.0-openjdk-devel
+    sudo yum update -y
+    sudo yum install -y java-1.8.0-openjdk-devel
 
     # 2. Add Cloudera Manager repository
     echo "Adding Cloudera Manager repository..."
-    wget $CM_REPO_URL -O /etc/yum.repos.d/cloudera-manager.repo
+    sudo wget $CM_REPO_URL -O /etc/yum.repos.d/cloudera-manager.repo
 
     # 3. Install Cloudera Manager Server, Agent, and Daemons
     echo "Installing Cloudera Manager Server and Agent..."
-    yum install -y cloudera-manager-server cloudera-manager-agent cloudera-manager-daemons
+    sudo yum install -y cloudera-manager-server cloudera-manager-agent cloudera-manager-daemons
 
     # 4. Install PostgreSQL (use version 16 in this case)
     echo "Installing PostgreSQL ${PG_VERSION}..."
-    yum install -y postgresql-server
+    sudo yum install -y postgresql-server
     
     # 5. Initialize and start PostgreSQL
     echo "Initializing and starting PostgreSQL..."
-    postgresql-setup initdb
-    systemctl start postgresql
-    systemctl enable postgresql
+    sudo postgresql-setup initdb
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
 
     # 6. Set PostgreSQL to listen on all interfaces
     echo "Configuring PostgreSQL to listen on all interfaces..."
-    cp pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
-    cp postgresql.conf /var/lib/pgsql/data/postgresql.conf
+    sudo cp pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
+    sudo cp postgresql.conf /var/lib/pgsql/data/postgresql.conf
 
     # 7. Restart PostgreSQL to apply changes
-    systemctl restart postgresql
+    sudo systemctl restart postgresql
 
     # 8. Create PostgreSQL users and databases for Cloudera Manager
     echo "Creating PostgreSQL users and databases for Cloudera Manager..."
@@ -66,27 +66,27 @@ CREATE DATABASE oozie OWNER oozie ENCODING 'UTF8';
 EOF
 
     # 8. Install the PostgreSQL JDBC driver
-    wget -O /usr/share/java/postgresql-connector-java.jar https://jdbc.postgresql.org/download/postgresql-42.7.2.jar
-    chmod 644 /usr/share/java/postgresql-connector-java.jar
+    sudo wget -O /usr/share/java/postgresql-connector-java.jar https://jdbc.postgresql.org/download/postgresql-42.7.2.jar
+    sudo chmod 644 /usr/share/java/postgresql-connector-java.jar
 
 
     # 9. Initialize Cloudera Manager database schema with PostgreSQL
     echo "Initializing Cloudera Manager database schema..."
-    /opt/cloudera/cm/schema/scm_prepare_database.sh postgresql scm scm scm_password
+    sudo /opt/cloudera/cm/schema/scm_prepare_database.sh postgresql scm scm scm_password
 
     # 10. Start Cloudera Manager Server
     echo "Starting Cloudera Manager Server..."
-    systemctl start cloudera-scm-server
+    sudo systemctl start cloudera-scm-server
 
     # 11. Enable services to start on boot
     echo "Enabling Cloudera Manager services on boot..."
-    systemctl enable cloudera-scm-server
-    systemctl enable cloudera-scm-agent
-    systemctl enable postgresql
+    sudo systemctl enable cloudera-scm-server
+    sudo systemctl enable cloudera-scm-agent
+    sudo systemctl enable postgresql
 
     echo "Cloudera Manager installation completed!"
     echo "You can access the Cloudera Manager Web UI at http://<your-server-ip>:7180"
 }
 
 # Execute the function to install Cloudera Manager
-install_cloudera_manager
+sudo install_cloudera_manager
