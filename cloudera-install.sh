@@ -14,7 +14,7 @@ install_cloudera_manager() {
     # 1. Install Java (OpenJDK 1.8.0)
     echo "Installing Java..."
     sudo yum update -y
-    sudo yum install -y java-1.8.0-openjdk-devel
+    sudo yum install -y java-1.8.0-openjdk-devel python38
 
     # 2. Add Cloudera Manager repository
     echo "Adding Cloudera Manager repository..."
