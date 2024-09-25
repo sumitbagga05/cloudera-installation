@@ -89,4 +89,4 @@ EOF
 }
 
 # Execute the function to install Cloudera Manager
-sudo install_cloudera_manager
+install_cloudera_manager
