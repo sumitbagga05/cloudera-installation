@@ -24,7 +24,8 @@ install_cloudera_manager() {
 
     # 3. Install Cloudera Manager Server, Agent, and Daemons
     echo "Installing Cloudera Manager Server and Agent..."
-    sudo yum install -y cloudera-manager-server cloudera-manager-agent cloudera-manager-daemons python38-pip wget
+    sudo yum install -y cloudera-manager-server cloudera-manager-agent cloudera-manager-daemons
+    sudo yum install -y python38-pip wget
 
     # 4. Install PostgreSQL (use version 16 in this case)
     echo "Installing PostgreSQL ${PG_VERSION}..."
