@@ -28,7 +28,8 @@ install_cloudera_manager() {
 
     # 4. Install PostgreSQL (use version 16 in this case)
     echo "Installing PostgreSQL ${PG_VERSION}..."
-    sudo yum install -y postgresql-server
+    sudo yum install -y postgresql-server postgresql-devel python-devel
+    sudo pip3.8 install psycopg2-binary
     
     # 5. Initialize and start PostgreSQL
     echo "Initializing and starting PostgreSQL..."
@@ -56,6 +57,7 @@ CREATE ROLE nav LOGIN PASSWORD 'nav_password';
 CREATE ROLE navms LOGIN PASSWORD 'navms_password';
 CREATE ROLE hue LOGIN PASSWORD 'hue_password';
 CREATE ROLE oozie LOGIN PASSWORD 'oozie_password';
+CREATE DATABASE hive OWNER hive ENCODING 'UTF8';
 CREATE DATABASE scm OWNER scm ENCODING 'UTF8';
 CREATE DATABASE amon OWNER amon ENCODING 'UTF8';
 CREATE DATABASE rman OWNER rman ENCODING 'UTF8';
