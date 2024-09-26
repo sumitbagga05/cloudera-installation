@@ -16,7 +16,7 @@ install_cloudera_manager() {
     # 1. Install Java (OpenJDK 1.8.0)
     echo "Installing Java..."
     sudo yum update -y
-    sudo yum install -y java-1.8.0-openjdk-devel python38
+    sudo yum install -y java-1.8.0-openjdk-devel python38 postgresql-devel python-devel 
 
     # 2. Add Cloudera Manager repository
     echo "Adding Cloudera Manager repository..."
@@ -28,7 +28,7 @@ install_cloudera_manager() {
 
     # 4. Install PostgreSQL (use version 16 in this case)
     echo "Installing PostgreSQL ${PG_VERSION}..."
-    sudo yum install -y postgresql-server postgresql-devel python-devel
+    sudo yum install -y postgresql-server
     sudo pip3.8 install psycopg2-binary
     
     # 5. Initialize and start PostgreSQL
