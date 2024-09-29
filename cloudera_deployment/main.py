@@ -14,29 +14,29 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Step 1: Create Cluster
-    subprocess.run(["python", "create_cluster.py", "--cm_host", args.cm_host,
+    subprocess.run(["python3", "create_cluster.py", "--cm_host", args.cm_host,
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--version", args.version])
 
     # Step 2: Add Hosts
-    subprocess.run(["python", "add_hosts.py", "--cm_host", args.cm_host,
+    subprocess.run(["python3", "add_hosts.py", "--cm_host", args.cm_host,
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--hosts"] + args.hosts)
 
     # Step 3: Start Parcel Download
-    subprocess.run(["python", "start_parcel_download.py", "--cm_host", args.cm_host,
+    subprocess.run(["python3", "start_parcel_download.py", "--cm_host", args.cm_host,
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--product", args.product,
                     "--version", args.version])
 
     # Step 4: Start Parcel Distribution
-    subprocess.run(["python", "start_parcel_distribution.py", "--cm_host", args.cm_host,
+    subprocess.run(["python3", "start_parcel_distribution.py", "--cm_host", args.cm_host,
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--product", args.product,
                     "--version", args.version])
 
     # Step 5: Activate Parcel
-    subprocess.run(["python", "activate_parcel.py", "--cm_host", args.cm_host,
+    subprocess.run(["python3", "activate_parcel.py", "--cm_host", args.cm_host,
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--product", args.product,
                     "--version", args.version])
