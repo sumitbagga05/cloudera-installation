@@ -1,0 +1,13 @@
+{
+    "cm_host": "http://m1:7180",
+    "username": "admin",
+    "password": "admin",
+    "cluster_name": "MyBaseCluster",
+    "version": "7.1.8-1.cdh7.1.8.p0.30990532",
+    "hosts": [
+        "m1.internal.cloudapp.net",
+        "w1.internal.cloudapp.net",
+        "w2.internal.cloudapp.net"
+    ]
+}
+
