@@ -26,23 +26,35 @@ def activate_parcel(cm_host, username, password, cluster_name, product, version)
         print(f"Response: {response.text}")
         return False
 
+def check_parcel_status(cm_host, username, password, cluster_name, product, version):
+    url = f"{cm_host}/api/v54/clusters/{cluster_name}/parcels/products/{product}/versions/{version}"
+    response = requests.get(url, auth=HTTPBasicAuth(username, password))
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to get parcel status. Status code: {response.status_code}")
+        print(f"Response: {response.text}")
+        return None
+
 def wait_for_parcel_activation(cm_host, username, password, cluster_name, product, version):
     while True:
-        url = f"{cm_host}/api/v54/clusters/{cluster_name}/parcels/products/{product}/versions/{version}"
-        response = requests.get(url, auth=HTTPBasicAuth(username, password))
+        parcel_info = check_parcel_status(cm_host, username, password, cluster_name, product, version)
+        
+        if parcel_info:
+            stage = parcel_info.get("stage")
+            activated = parcel_info.get("activated")
 
-        if response.status_code == 200:
-            parcel_info = response.json()
-            if parcel_info.get("activated"):
-                print("Parcel activated successfully.")
+            if stage == "ACTIVATED" and activated:
+                print("Parcel activation completed successfully.")
+                print(json.dumps(parcel_info, indent=2))
                 return True
+            elif stage == "ACTIVATING":
+                print(f"Parcel is still activating. Progress: {parcel_info.get('state', {}).get('progress', 0)}%")
             else:
-                print("Waiting for parcel activation to complete...")
-                time.sleep(10)
-        else:
-            print(f"Failed to get parcel status. Status code: {response.status_code}")
-            print(f"Response: {response.text}")
-            return False
+                print(f"Unexpected stage: {stage}")
+
+        time.sleep(10)  # Wait before checking the status again
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Activate Parcel')
@@ -54,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument('--version', required=True, help='Parcel version')
 
     args = parser.parse_args()
-    activate_parcel(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
-    wait_for_parcel_activation(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
+
+    if activate_parcel(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version):
+        wait_for_parcel_activation(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
 
