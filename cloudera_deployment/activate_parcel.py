@@ -38,9 +38,12 @@ def check_parcel_status(cm_host, username, password, cluster_name, product, vers
         return None
 
 def wait_for_parcel_activation(cm_host, username, password, cluster_name, product, version):
+    activated_counter = 0  # Counter to track consecutive "ACTIVATED" stages without activation
+    max_wait_cycles = 5  # Number of times to see "ACTIVATED" without changing before exiting
+    
     while True:
         parcel_info = check_parcel_status(cm_host, username, password, cluster_name, product, version)
-        
+
         if parcel_info:
             stage = parcel_info.get("stage")
             activated = parcel_info.get("activated", False)  # Default to False if not present
@@ -49,14 +52,23 @@ def wait_for_parcel_activation(cm_host, username, password, cluster_name, produc
             print(f"Parcel stage: {stage}")
             print(f"Parcel activated: {activated}")
 
-            if stage == "ACTIVATED" and activated:
-                print("Parcel activation completed successfully.")
-                print(json.dumps(parcel_info, indent=2))
-                return True
+            if stage == "ACTIVATED":
+                if activated:
+                    print("Parcel activation completed successfully.")
+                    print(json.dumps(parcel_info, indent=2))
+                    return True
+                else:
+                    print("Parcel is in the ACTIVATED stage but not marked as activated.")
+                    activated_counter += 1
+                    if activated_counter >= max_wait_cycles:
+                        print("Max wait cycles reached while waiting for parcel activation. Exiting.")
+                        return False
             elif stage == "ACTIVATING":
                 print(f"Parcel is still activating. Progress: {parcel_info.get('state', {}).get('progress', 0)}%")
+                activated_counter = 0  # Reset counter if still activating
             else:
                 print(f"Unexpected stage: {stage}. Continuing to wait...")
+                activated_counter = 0  # Reset counter for unexpected stages
 
         time.sleep(10)  # Wait before checking the status again
 
