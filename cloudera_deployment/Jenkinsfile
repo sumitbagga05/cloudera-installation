@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     def hostsList = params.HOSTS.split()
-                    sh "python main.py --cm_host ${params.CM_HOST} --username ${params.USERNAME} --password ${params.PASSWORD} --cluster_name ${params.CLUSTER_NAME} --version ${params.VERSION} --hosts ${hostsList.join(' ')} --product ${params.PRODUCT}"
+                    sh "python cloudera_deployment/main.py --cm_host ${params.CM_HOST} --username ${params.USERNAME} --password ${params.PASSWORD} --cluster_name ${params.CLUSTER_NAME} --version ${params.VERSION} --hosts ${hostsList.join(' ')} --product ${params.PRODUCT}"
                 }
             }
         }
