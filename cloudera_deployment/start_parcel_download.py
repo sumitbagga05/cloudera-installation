@@ -22,26 +22,39 @@ def start_parcel_download(cm_host, username, password, cluster_name, product, ve
         print(f"Response: {response.text}")
         return False
 
-def wait_for_parcel_download(cm_host, username, password, cluster_name, product, version):
-    while True:
+def wait_for_parcel_download(cm_host, username, password, cluster_name, product, version, timeout=600, interval=10):
+    elapsed_time = 0
+    while elapsed_time < timeout:
         url = f"{cm_host}/api/v54/clusters/{cluster_name}/parcels/products/{product}/versions/{version}"
         response = requests.get(url, auth=HTTPBasicAuth(username, password))
 
         if response.status_code == 200:
             parcel_info = response.json()
-            if parcel_info.get("downloaded"):
-                print("Parcel download completed.")
+            stage = parcel_info.get("stage")
+            
+            if stage == "DOWNLOADED":
+                print("Parcel download completed successfully.")
+                print(json.dumps(parcel_info, indent=2))
                 return True
+            elif stage == "DOWNLOADING":
+                progress = parcel_info.get('state', {}).get('progress', 0)
+                print(f"Parcel is still downloading. Current progress: {progress}%")
             else:
-                print("Waiting for parcel download to complete...")
-                time.sleep(10)
+                print(f"Unexpected status: {stage}")
         else:
             print(f"Failed to get parcel status. Status code: {response.status_code}")
             print(f"Response: {response.text}")
             return False
 
+        time.sleep(interval)
+        elapsed_time += interval
+
+    # Timeout reached
+    print(f"Timeout reached after {timeout} seconds. Parcel download did not complete.")
+    return False
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Start Parcel Download')
+    parser = argparse.ArgumentParser(description='Start and Monitor Parcel Download')
     parser.add_argument('--cm_host', required=True, help='Cloudera Manager host URL')
     parser.add_argument('--username', required=True, help='Cloudera Manager username')
     parser.add_argument('--password', required=True, help='Cloudera Manager password')
@@ -50,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument('--version', required=True, help='Parcel version')
 
     args = parser.parse_args()
-    start_parcel_download(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
-    wait_for_parcel_download(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
+
+    if start_parcel_download(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version):
+        wait_for_parcel_download(args.cm_host, args.username, args.password, args.cluster_name, args.product, args.version)
 
