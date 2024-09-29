@@ -2,6 +2,7 @@ import requests
 import json
 from requests.auth import HTTPBasicAuth
 import argparse
+import time
 
 def create_cluster(cm_host, username, password, cluster_name, version):
     CM_URL = f"{cm_host}/api/v54/clusters"
@@ -28,11 +29,14 @@ def create_cluster(cm_host, username, password, cluster_name, version):
         if response.status_code in [200, 201]:
             print("Cluster created successfully.")
             print(f"Response: {response.json()}")
+            return True
         else:
             print(f"Failed to create cluster. Status code: {response.status_code}")
             print(f"Response: {response.text}")
+            return False
     except Exception as e:
         print(f"An error occurred while creating the cluster: {e}")
+        return False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create Cloudera Cluster')
@@ -43,5 +47,5 @@ if __name__ == "__main__":
     parser.add_argument('--version', required=True, help='CDH version')
 
     args = parser.parse_args()
-    create_cluster(args.cm_host, args.username, args.password, args.cluster_name, args.version)
+    success = create_cluster(args.cm_host, args.username, args.password, args.cluster_name, args.version)
 
