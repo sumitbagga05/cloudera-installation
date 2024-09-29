@@ -1,12 +1,12 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'CM_HOST', defaultValue: 'http://cloudera-manager:7180', description: 'Cloudera Manager Host')
+        string(name: 'CM_HOST', defaultValue: 'http://20.106.18.175:7180', description: 'Cloudera Manager Host')
         string(name: 'USERNAME', defaultValue: 'admin', description: 'Cloudera Manager Username')
         string(name: 'PASSWORD', defaultValue: 'admin', description: 'Cloudera Manager Password')
-        string(name: 'CLUSTER_NAME', defaultValue: 'my-cluster', description: 'Cluster Name')
-        string(name: 'VERSION', defaultValue: '7.2.1', description: 'CDH Version')
-        string(name: 'HOSTS', defaultValue: 'host1 host2 host3', description: 'Space-separated list of hostnames to add')
+        string(name: 'CLUSTER_NAME', defaultValue: 'MyBaseCluster', description: 'Cluster Name')
+        string(name: 'VERSION', defaultValue: '7.1.8-1.cdh7.1.8.p0.30990532', description: 'CDH Version')
+        string(name: 'HOSTS', defaultValue: 'm1.internal.cloudapp.net w1.internal.cloudapp.net w2.internal.cloudapp.net', description: 'Space-separated list of hostnames to add')
         string(name: 'PRODUCT', defaultValue: 'CDH', description: 'Product Name')
     }
     stages {
