@@ -43,7 +43,11 @@ def wait_for_parcel_activation(cm_host, username, password, cluster_name, produc
         
         if parcel_info:
             stage = parcel_info.get("stage")
-            activated = parcel_info.get("activated")
+            activated = parcel_info.get("activated", False)  # Default to False if not present
+
+            # Debugging logs to verify what is being received
+            print(f"Parcel stage: {stage}")
+            print(f"Parcel activated: {activated}")
 
             if stage == "ACTIVATED" and activated:
                 print("Parcel activation completed successfully.")
@@ -52,7 +56,7 @@ def wait_for_parcel_activation(cm_host, username, password, cluster_name, produc
             elif stage == "ACTIVATING":
                 print(f"Parcel is still activating. Progress: {parcel_info.get('state', {}).get('progress', 0)}%")
             else:
-                print(f"Unexpected stage: {stage}")
+                print(f"Unexpected stage: {stage}. Continuing to wait...")
 
         time.sleep(10)  # Wait before checking the status again
 
