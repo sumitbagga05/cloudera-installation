@@ -1,23 +1,34 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import argparse
+import sys
+import json
 
 def cms_exists(cm_host, username, password):
-    url = f"{cm_host}/api/v54/cm/service/ClouderaManagementService"
+    """Check if Cloudera Management Service exists."""
+    url = f"{cm_host}/api/v54/cm/service"
     response = requests.get(url, auth=HTTPBasicAuth(username, password))
-    return response.status_code == 200
+    
+    if response.status_code == 200:
+        service = response.json().get('name', '')
+        if service == 'ClouderaManagementService':
+            return True
+    return False
 
 def delete_cms(cm_host, username, password):
-    url = f"{cm_host}/api/v54/cm/service/ClouderaManagementService"
+    """Delete existing Cloudera Management Service."""
+    url = f"{cm_host}/api/v54/cm/service"
     response = requests.delete(url, auth=HTTPBasicAuth(username, password))
-    return response
-
-def start_cms(cm_host, username, password):
-    url = f"{cm_host}/api/v54/cm/service/ClouderaManagementService/start"
-    response = requests.put(url, auth=HTTPBasicAuth(username, password))
-    return response.status_code == 200
+    
+    if response.status_code == 200:
+        print("CMS deleted successfully.")
+    else:
+        print(f"Failed to delete CMS. Status code: {response.status_code}")
+        print("Response:", response.text)
+        sys.exit(1)
 
 def create_cms(cm_host, username, password, hosts):
+    """Create a new Cloudera Management Service."""
     url = f"{cm_host}/api/v54/cm/service"
     payload = {
         "type": "MGMT",
@@ -29,12 +40,31 @@ def create_cms(cm_host, username, password, hosts):
             {"type": "ALERTPUBLISHER", "hostRef": {"hostId": hosts[0]}}
         ]
     }
+
+    response = requests.put(url, json=payload, auth=HTTPBasicAuth(username, password))
     
-    response = requests.post(url, json=payload, auth=HTTPBasicAuth(username, password))
-    return response
+    if response.status_code == 200:
+        print("Cloudera Management Service created successfully.")
+        return True
+    else:
+        print(f"Failed to create Cloudera Management Service. Status code: {response.status_code}")
+        print("Response:", response.text)
+        return False
+
+def start_cms(cm_host, username, password):
+    """Start the Cloudera Management Service."""
+    url = f"{cm_host}/api/v54/cm/service/commands/start"
+    response = requests.post(url, auth=HTTPBasicAuth(username, password))
+    
+    if response.status_code == 200:
+        print("Cloudera Management Service started successfully.")
+    else:
+        print(f"Failed to start Cloudera Management Service. Status code: {response.status_code}")
+        print("Response:", response.text)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Delete, Create and Start Cloudera Management Service')
+    parser = argparse.ArgumentParser(description='Delete, Create, and Start Cloudera Management Service')
     parser.add_argument('--cm_host', required=True, help='Cloudera Manager host URL')
     parser.add_argument('--username', required=True, help='Cloudera Manager username')
     parser.add_argument('--password', required=True, help='Cloudera Manager password')
@@ -42,29 +72,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # Check if CMS exists
     if cms_exists(args.cm_host, args.username, args.password):
         print("Cloudera Management Service already exists. Deleting it...")
-        delete_response = delete_cms(args.cm_host, args.username, args.password)
-        
-        if delete_response.status_code == 200:
-            print("CMS deleted successfully.")
-        else:
-            print("Failed to delete CMS. Please check the logs for more details.")
-            print(f"Response: {delete_response.json()}")
-            exit(1)
+        delete_cms(args.cm_host, args.username, args.password)
 
+    # Create the CMS
     print("Creating Cloudera Management Service...")
-    create_response = create_cms(args.cm_host, args.username, args.password, args.hosts)
-
-    if create_response.status_code == 201:  # 201 Created
-        print("Cloudera Management Service created successfully.")
-        
-        # Start the CMS after successful creation
-        if start_cms(args.cm_host, args.username, args.password):
-            print("CMS started successfully.")
-        else:
-            print("Failed to start the CMS after creation. Please check the logs for more details.")
-    else:
-        print(f"Failed to create Cloudera Management Service. Status code: {create_response.status_code}")
-        print("Response:", create_response.json())
+    if create_cms(args.cm_host, args.username, args.password, args.hosts):
+        # Start the CMS
+        print("Starting Cloudera Management Service...")
+        start_cms(args.cm_host, args.username, args.password)
 
