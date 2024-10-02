@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'CM_HOST', defaultValue: 'http://20.106.18.175:7180', description: 'Cloudera Manager Host')
+        string(name: 'USERNAME', defaultValue: 'admin', description: 'Cloudera Manager Username')
+        string(name: 'PASSWORD', defaultValue: 'admin', description: 'Cloudera Manager Password')
+        string(name: 'CLUSTER_NAME', defaultValue: 'MyBaseCluster', description: 'Cluster Name')
+        string(name: 'HOSTS', defaultValue: 'm1.internal.cloudapp.net w1.internal.cloudapp.net', description: 'Space-separated list of hostnames')
+        choice(name: 'SERVICES', choices: ['HDFS,YARN,ZooKeeper,HiveMetastore', 'HDFS,YARN', 'ZooKeeper,HiveMetastore'], description: 'Select services to install')
+    }
+    stages {
+        stage('Install Selected Services') {
+            steps {
+                script {
+                    def hostsList = params.HOSTS.split()
+                    def servicesList = params.SERVICES.split(',')
+
+                    // Run the installation script with selected services
+                    sh "python3 cloudera_deployment/install_services.py --cm_host ${params.CM_HOST} --username ${params.USERNAME} --password ${params.PASSWORD} --cluster_name ${params.CLUSTER_NAME} --hosts ${hostsList.join(' ')} --services ${servicesList.join(',')}"
+                }
+            }
+        }
+    }
+}
+
