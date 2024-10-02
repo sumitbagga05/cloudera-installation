@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument('--version', required=True, help='CDH version')
     parser.add_argument('--hosts', required=True, nargs='+', help='List of hosts to add to the cluster')
     parser.add_argument('--product', required=True, help='Product name')
-    
+
     args = parser.parse_args()
 
     # Step 1: Create Cluster
@@ -40,4 +40,9 @@ if __name__ == "__main__":
                     "--username", args.username, "--password", args.password,
                     "--cluster_name", args.cluster_name, "--product", args.product,
                     "--version", args.version])
+
+    # Step 6: Create Cloudera Management Service
+    subprocess.run(["python3", "cloudera_deployment/create_cms.py", "--cm_host", args.cm_host,
+                    "--username", args.username, "--password", args.password,
+                    "--hosts"] + args.hosts)
 

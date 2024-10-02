@@ -18,6 +18,14 @@ pipeline {
                 }
             }
         }
+        stage('Create Cloudera Management Service') {
+            steps {
+                script {
+                    def hostsList = params.HOSTS.split()
+                    sh "python3 cloudera_deployment/create_cms.py --cm_host ${params.CM_HOST} --username ${params.USERNAME} --password ${params.PASSWORD} --hosts ${hostsList.join(' ')}"
+                }
+            }
+        }
     }
 }
 
